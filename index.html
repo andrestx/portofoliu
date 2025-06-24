@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portofoliu Proiecte Web</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: #ffffff;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        header {
+            background-color: #f8f8f8;
+            padding: 2rem 0;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #222;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .about {
+            padding: 3rem 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .about h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: #222;
+        }
+        
+        .about p {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 1rem;
+        }
+        
+        .highlight {
+            background-color: rgba(74, 111, 165, 0.1);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+        
+        .portfolio {
+            padding: 3rem 0;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .projects {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            padding: 0 2rem;
+        }
+        
+        .project-card {
+            background-color: #f8f8f8;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .project-image {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .project-info {
+            padding: 1.5rem;
+        }
+        
+        .project-info h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #222;
+        }
+        
+        .project-info p {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: #4a6fa5;
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn:hover {
+            background-color: #3a5a80;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            background-color: #f8f8f8;
+            border-top: 1px solid #eee;
+            margin-top: 2rem;
+        }
+        
+        .contact-info {
+            margin-top: 1rem;
+        }
+        
+        .contact-info a {
+            color: #4a6fa5;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Animație bule */
+        .bubble-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 150px;
+            height: 200px;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .bubble {
+            position: absolute;
+            bottom: 0;
+            background-color: rgba(74, 111, 165, 0.2);
+            border-radius: 50%;
+            animation: rise 8s infinite ease-in;
+        }
+        
+        @keyframes rise {
+            0% {
+                transform: translateY(0) translateX(0) scale(0.5);
+                opacity: 0;
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateY(-200px) translateX(20px) scale(1.2);
+                opacity: 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .projects {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Portofoliu Proiecte Web</h1>
+        <p class="subtitle">O colecție a proiectelor mele recente, realizate cu atenție la detalii și focus pe experiența utilizatorului.</p>
+    </header>
+    
+    <section class="about">
+        <h2>Despre mine</h2>
+        <p>Sunt <span class="highlight">student</span> și <span class="highlight">pasionat de informatică</span>, cu o deosebită interes pentru dezvoltarea de soluții web.</p>
+        <p>Îmi place să creez <span class="highlight">site-uri moderne</span> și <span class="highlight">funcționale</span>, combinând designul atractiv cu o experiență de utilizare plăcută.</p>
+        <p>Proiectele prezentate mai jos sunt realizate de mine și demonstrează abilitățile mele în domeniul <span class="highlight">dezvoltării web</span>.</p>
+    </section>
+    
+    <section class="portfolio">
+        <div class="projects">
+            <div class="project-card">
+                <div class="project-image" style="background-image: url('https://via.placeholder.com/600x400?text=Suruburi+Brasov');"></div>
+                <div class="project-info">
+                    <h3>Șuruburi Brașov</h3>
+                    <p>Magazin online specializat în vânzarea de șuruburi, șaibe și alte elemente de fixare. Site-ul include catalog de produse, sistem de comandă și informații utile pentru profesioniști.</p>
+                    <a href="http://www.suruburibrasov.com" target="_blank" class="btn">Vizitează site-ul</a>
+                </div>
+            </div>
+            
+            <div class="project-card">
+                <div class="project-image" style="background-image: url('https://via.placeholder.com/600x400?text=Biroul+Creditelor');"></div>
+                <div class="project-info">
+                    <h3>Biroul Creditelor</h3>
+                    <p>Platformă informativă despre credite și împrumuturi. Oferă comparații între ofertele băncilor, calculator de rate și sfaturi pentru obținerea celui mai bun credit.</p>
+                    <a href="http://www.biroulcreditelor.com" target="_blank" class="btn">Vizitează site-ul</a>
+                </div>
+            </div>
+            
+            <div class="project-card">
+                <div class="project-image" style="background-image: url('https://via.placeholder.com/600x400?text=TSKRO');"></div>
+                <div class="project-info">
+                    <h3>TSKRO</h3>
+                    <p>Site-ul oficial al unei organizații nonprofit care activează în domeniul asistenței sociale. Prezintă activitățile organizației, proiecte curente și modalități de implicare.</p>
+                    <a href="http://www.tskro.org" target="_blank" class="btn">Vizitează site-ul</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <footer>
+        <p>&copy; 2023 Portofoliu Proiecte Web. Toate drepturile rezervate.</p>
+        <div class="contact-info">
+            <p>Contact: <a href="mailto:andreistanescux@gmail.com">andreistanescux@gmail.com</a></p>
+        </div>
+    </footer>
+    
+    <!-- Animație bule -->
+    <div class="bubble-container" id="bubbleContainer"></div>
+    
+    <script>
+        // Creare bule animate
+        function createBubbles() {
+            const container = document.getElementById('bubbleContainer');
+            const bubbleCount = 8;
+            
+            for (let i = 0; i < bubbleCount; i++) {
+                setTimeout(() => {
+                    const bubble = document.createElement('div');
+                    bubble.classList.add('bubble');
+                    
+                    // Dimensiuni aleatorii
+                    const size = Math.random() * 30 + 10;
+                    bubble.style.width = `${size}px`;
+                    bubble.style.height = `${size}px`;
+                    
+                    // Poziție orizontală aleatorie
+                    bubble.style.left = `${Math.random() * 100}px`;
+                    
+                    // Viteză animație diferită
+                    const duration = Math.random() * 5 + 5;
+                    bubble.style.animationDuration = `${duration}s`;
+                    
+                    // Întârziere aleatorie
+                    bubble.style.animationDelay = `${Math.random() * 5}s`;
+                    
+                    container.appendChild(bubble);
+                    
+                    // Elimină bulele după ce animația se termină
+                    setTimeout(() => {
+                        bubble.remove();
+                    }, duration * 1000);
+                }, i * 2000); // Crează o nouă bulă la fiecare 2 secunde
+            }
+        }
+        
+        // Pornire animație și reîmprospătare periodică
+        createBubbles();
+        setInterval(createBubbles, 16000);
+    </script>
+</body>
+</html>
