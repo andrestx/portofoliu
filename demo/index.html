@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Live Demo | Andrei Stanescu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Playfair+Display:wght@600;700&family=Figtree:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b1020;           /* app background */
+      --panel:#0f162e;        /* panels */
+      --muted:#9aa4b2;        /* secondary text */
+      --text:#edf1f7;         /* primary text */
+      --primary:#66d1ff;      /* default accent */
+      --primary-600:#38bdf8;
+      --success:#22c55e;
+      --warn:#f59e0b;
+      --error:#ef4444;
+      --radius:16px;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+      --preview-max:1100px;   /* max preview width */
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:radial-gradient(1200px 700px at 10% -10%, #1b2b5b 0%, transparent 55%),
+                             radial-gradient(900px 600px at 120% 20%, #1c3a52 0%, transparent 50%),
+                             var(--bg);
+         color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;}
+    a{color:var(--primary)}
+    .app{max-width:1200px;margin:0 auto;padding:20px}
+    .header{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap}
+    .brand{display:flex;gap:12px;align-items:center}
+    .brand .logo{width:36px;height:36px;display:grid;place-items:center;border-radius:12px;background:linear-gradient(135deg,var(--primary),#9b8cff)}
+    .brand h1{font-size:18px;margin:0;font-weight:800;letter-spacing:.3px}
+    .muted{color:var(--muted)}
+
+    /* LAYOUT – single column on small screens, fluid on large */
+    .layout{display:grid;grid-template-columns:1fr;gap:16px;align-items:start}
+    @media (min-width:1000px){.layout{grid-template-columns:minmax(320px,420px) 1fr}}
+
+    .panel{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
+           border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);box-shadow:var(--shadow)}
+    .panel .head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
+    .panel .head h2{font-size:16px;margin:0;font-weight:800;letter-spacing:.4px}
+    .panel .body{padding:14px 16px}
+
+    .grid{display:grid;gap:10px}
+    .grid.two{grid-template-columns:1fr 1fr}
+    .grid.three{grid-template-columns:1fr 1fr 1fr}
+    @media (max-width:700px){.grid.two,.grid.three{grid-template-columns:1fr}}
+
+    label{font-size:13px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--muted)}
+    input[type="text"], input[type="url"], input[type="number"], select, textarea{
+      width:100%; padding:12px 12px; border-radius:12px;border:1px solid rgba(255,255,255,.22);
+      background:rgba(255,255,255,.06);color:var(--text);outline:none
+    }
+    input,select,textarea{font-size:16px}
+    input:focus, select:focus, textarea:focus{outline:2px solid var(--primary); outline-offset:1px}
+    textarea{min-height:72px;resize:vertical}
+
+    .swatches{display:flex;gap:10px;flex-wrap:wrap}
+    .swatch{width:34px;height:34px;border-radius:9px;border:2px solid rgba(255,255,255,.18);cursor:pointer;position:relative}
+    .swatch.active{outline:2px solid var(--primary)}
+
+    .btn{display:inline-flex;align-items:center;gap:10px;padding:12px 16px;border-radius:12px;border:1px solid rgba(255,255,255,.14);cursor:pointer;background:rgba(255,255,255,.06);color:var(--text);font-weight:800}
+    .btn[disabled]{opacity:.5;cursor:not-allowed}
+    .btn.primary{background:linear-gradient(135deg,var(--primary-600),var(--primary));border:none;color:#001728}
+    .btn.ghost{background:transparent}
+    .btn.small{padding:10px 12px;font-size:14px}
+    .btn.block{width:100%;justify-content:center}
+
+    .tabs{display:flex;gap:8px;flex-wrap:wrap}
+    .tab{padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.06);cursor:pointer;border:1px solid rgba(255,255,255,.1);font-weight:700}
+    .tab.active{background:var(--primary);color:#001728;border-color:transparent}
+
+    /* PREVIEW SIDE */
+    .previewWrap{position:relative}
+    .previewToolbar{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-bottom:10px}
+    .preview{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,.45);margin:0 auto;max-width:var(--preview-max);width:100%}
+    .preview .bar{height:42px;background:linear-gradient( to right, #111827, #0b1227);display:flex;align-items:center;gap:8px;padding:0 12px;color:#9ca3af}
+    .dot{width:10px;height:10px;border-radius:999px;background:#ef4444}
+    .dot:nth-child(2){background:#f59e0b}
+    .dot:nth-child(3){background:#10b981}
+    iframe{display:block;width:100%;height:min(70vh,780px);border:0}
+
+    /* PAYWALL OVERLAY (bottom 25% blurred) */
+    .blurOverlay{position:absolute;left:0;right:0;bottom:0;height:25%;pointer-events:auto;display:flex;align-items:flex-end;justify-content:center}
+    .blurOverlay::before{content:"";position:absolute;inset:0;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);background:linear-gradient(to bottom, rgba(11,16,32,0) 0%, rgba(11,16,32,.6) 60%, rgba(11,16,32,.85) 100%)}
+    .blurBox{position:relative;margin:12px;padding:14px 16px;border-radius:14px;background:rgba(15,22,46,.9);border:1px solid rgba(255,255,255,.12);box-shadow:0 10px 30px rgba(0,0,0,.35);display:flex;align-items:center;gap:12px}
+    .blurBox .lock{font-size:18px}
+    .blurBox .text{font-weight:700}
+
+    /* Empty state */
+    .empty{display:grid;place-items:center;border:1px dashed rgba(255,255,255,.25);border-radius:14px;padding:20px;color:var(--muted);text-align:center}
+
+    /* TEMPLATE CSS injected into preview */
+    .tpl-root{--tpl-primary:#4f46e5;--tpl-secondary:#0ea5e9;--tpl-font:Inter}
+    .tpl{font-family:var(--tpl-font, Inter), system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;color:#0f172a}
+    .tpl a{text-decoration:none;color:inherit}
+    .tpl .hero{position:relative;padding:90px 28px;background:linear-gradient( 135deg, var(--tpl-primary) 0%, var(--tpl-secondary) 100%);color:white}
+    .tpl .hero .inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.1fr 1fr;gap:30px;align-items:center}
+    .tpl .hero h1{font-size:42px;line-height:1.05;margin:0;font-family:var(--tpl-font)}
+    .tpl .hero p{opacity:.9;margin:10px 0 18px}
+    .tpl .hero .cta{display:flex;gap:10px;flex-wrap:wrap}
+    .tpl .btn{background:#fff;color:#111827;padding:12px 16px;border-radius:12px;font-weight:800;border:2px solid rgba(0,0,0,.08)}
+    .tpl .btn.sec{background:transparent;color:#fff;border-color:rgba(255,255,255,.6)}
+    .tpl nav{backdrop-filter:saturate(180%) blur(8px);position:sticky;top:0;background:rgba(255,255,255,.7);border-bottom:1px solid rgba(0,0,0,.08)}
+    .tpl nav .inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:12px 20px}
+    .tpl nav .logo{display:flex;align-items:center;gap:10px;font-weight:900}
+    .tpl section{padding:56px 20px}
+    .tpl .container{max-width:1100px;margin:0 auto}
+    .tpl .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
+    .tpl .card{border:1px solid #e5e7eb;border-radius:14px;padding:18px;background:#fff}
+    .tpl .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+    .tpl footer{padding:34px 20px;background:#0b1227;color:#cbd5e1}
+    .tpl .menu-item,.tpl .product,.tpl .project,.tpl .service{border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fff;display:flex;gap:14px;align-items:center}
+    .tpl .price{color:var(--tpl-secondary);font-weight:900}
+    .tpl .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+    .tpl .gallery img{width:100%;height:120px;object-fit:cover;border-radius:12px}
+    .tpl .badge{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.5);font-weight:800}
+
+.preview-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.fade-overlay {
+  position: absolute;
+  top: 75%; /* începe estomparea la 75% din container */
+  left: 0;
+  width: 100%;
+  height: 25%;
+  background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.95));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: all;
+}
+
+.lock-message {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-weight: bold;
+  text-align: center;
+  color: #333;
+}
+
+
+.back-button {
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  animation: pulse 1.5s infinite;
+}
+
+.back-button:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 18px rgba(66, 133, 244, 0.5);
+}
+
+/* Animația de puls */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(66, 133, 244, 0.6);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 12px rgba(66, 133, 244, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(66, 133, 244, 0);
+  }
+}
+    
+    
+     /* Navigation styles */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 15px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      background: rgba(8, 4, 4, 0.9);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 107, 107, 0.1);
+    }
+    
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+    
+    .logo-img {
+      height: 40px;
+      width: auto;
+    }
+    
+    .logo-text {
+      font-size: 20px;
+      font-weight: 700;
+      color: white;
+    }
+    
+    .logo-text span {
+      color: var(--accent);
+    }
+    
+    .nav-links {
+      display: flex;
+      gap: 30px;
+    }
+    
+    .nav-links a {
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      position: relative;
+      padding: 8px 0;
+    }
+    
+    .nav-links a:hover {
+      color: white;
+    }
+    
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #ff6b6b, #ff9a6b);
+      transition: width 0.3s ease;
+    }
+    
+    .logo-text span {
+  color: #fc7068;
+}
+
+    
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+    
+    /* Stiluri pentru mobil */
+    @media (max-width: 768px) {
+      nav {
+        padding: 12px 20px;
+      }
+      .nav-links {
+        gap: 15px;
+      }
+      .logo-text {
+        font-size: 18px;
+      }
+      .logo-img {
+        height: 32px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .nav-links {
+        gap: 10px;
+        font-size: 14px;
+      }
+      .logo-text {
+        display: none; /* Ascundem textul pe mobil */
+      }
+    }
+
+    
+    
+    @media (max-width:900px){.tpl .hero .inner{grid-template-columns:1fr}}
+    @media (prefers-reduced-motion: reduce){*{scroll-behavior:auto;animation:none!important;transition:none!important}}
+  </style>
+</head>
+
+<body>
+  
+   <nav>
+    <a href="#" class="logo-container">
+      <!-- Înlocuiește cu calea către logo-ul tău PNG -->
+      <img src="../images/logo.png" alt="" class="logo-img">
+      <div class="logo-text">Andrei <span>Stanescu</span></div>
+    </a>
+    <div class="nav-links">
+      <a href="https://www.andreist.great-site.net/">Acasă</a>
+      <a href="https://www.andreist.great-site.net/portofoliu/">Portofoliu</a>
+      <a href="https://www.andreist.great-site.net/demo/">DEMO</a>
+      <a href="#">Contact</a>
+      <a href="#">Despre</a>
+      <a href="#">Certificări</a>
+    </div>
+  </nav>
+  <div class="app">
+    <div class="header" aria-label="Antet aplicație">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">⚡</div>
+        <div>
+          <h1>Andrei Stanescu <span class="muted">Live Demo Studio</span></h1>
+          <div class="muted" style="font-size:12px">Completezi → vezi live → contactezi pentru versiunea completă</div>
+        </div>
+      </div>
+<a href="https://www.andreist.great-site.net/" class="back-button">⟵ Înapoi</a>
+      <div class="tabs" id="i18nTabs" role="tablist" aria-label="Limbi">
+        <div class="tab active" data-lang="ro" role="tab" aria-selected="true">RO</div>
+        <div class="tab" data-lang="en" role="tab" aria-selected="false">EN</div>
+      </div>
+    </div>
+
+    <div class="layout">
+      <!-- LEFT: Controls -->
+      <div class="panel" id="controls" aria-label="Panou setări">
+        <div class="head">
+          <h2 id="ui_setup">Setări & conținut</h2>
+          <div class="tabs" id="templateTabs" role="tablist" aria-label="Șabloane">
+            <div class="tab active" data-tpl="restaurant" role="tab" aria-selected="true">🍽️ Restaurant</div>
+            <div class="tab" data-tpl="shop" role="tab" aria-selected="false">🛒 Shop</div>
+            <div class="tab" data-tpl="portfolio" role="tab" aria-selected="false">🎨 Portofoliu</div>
+            <div class="tab" data-tpl="services" role="tab" aria-selected="false">🧰 Servicii</div>
+          </div>
+        </div>
+        <div class="body">
+          <div class="grid" aria-live="polite">
+            <div>
+              <label for="brandName" id="lbl_brand">Nume brand (obligatoriu)</label>
+              <input id="brandName" type="text" placeholder="Ex: Bistro Elegance" value="Bistro Elegance" required />
+            </div>
+            <div>
+              <label for="tagline" id="lbl_tag">Slogan / scurtă descriere (obligatoriu)</label>
+              <input id="tagline" type="text" placeholder="Ex: Bucătărie modernă cu gust autentic" value="Bucătărie modernă cu gust autentic" required />
+            </div>
+          </div>
+
+          <div class="grid two" style="margin-top:6px">
+            <div>
+              <label id="lbl_colors">Paletă de culori (OBLIGATORIU)</label>
+              <div class="swatches" id="palette"></div>
+            </div>
+            <div>
+              <label id="lbl_custom">Culoare personalizată (OPȚIONAL)</label>
+              <input type="color" id="colorPrimary" value="#4f46e5" />
+            </div>
+          </div>
+
+          <div class="grid two">
+            <div>
+              <label id="lbl_secondary">Culoare secundară (OPȚIONAL)</label>
+              <input type="color" id="colorSecondary" value="#0ea5e9" />
+            </div>
+            <div>
+              <label id="lbl_font">Font</label>
+              <select id="fontSelect">
+                <option value="Inter" selected>Inter (modern)</option>
+                <option value="Playfair Display">Playfair (elegant)</option>
+                <option value="Figtree">Figtree (curat)</option>
+                <option value="Arial">Arial (sistem)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid two">
+            <div>
+              <label id="lbl_logo">Logo (png/svg – opțional)</label>
+              <input id="logoInput" type="file" accept="image/*" />
+            </div>
+            <div>
+              <label id="lbl_hero">Imagine erou (URL)</label>
+              <input id="heroUrl" type="url" placeholder="https://..." value="https://images.unsplash.com/photo-1559339352-11d035aa65de?q=80&w=1600&auto=format&fit=crop" />
+            </div>
+          </div>
+
+          <div class="panel" style="margin-top:12px">
+<div class="head">
+  <h2 id="ui_content">
+    Conținut specific 
+    <br>
+    <i>(Completați în funcție de ceea ce ați ales: 
+      pentru <b>Restaurant</b> – Feluri, 
+      pentru <b>Shop</b> – Produs, 
+      pentru <b>Portofoliu</b> – Proiect, 
+      pentru <b>Servicii</b> – Serviciu.
+      <br>
+      Completați obligatoriu <u>Adresa</u> și <u>Programul</u>.)
+    </i>
+  </h2>
+</div>
+            <div class="body">
+              <!-- Restaurant content builder -->
+              <div class="grid" data-content="restaurant">
+                <div class="grid three">
+                  <div>
+                    <label>Fel 1</label>
+                    <input class="r-name" type="text" value="Pasta Carbonara"/>
+                    <input class="r-desc" type="text" value="Guanciale, pecorino, gălbenuș"/>
+                    <input class="r-price" type="number" value="45"/>
+                  </div>
+                  <div>
+                    <label>Fel 2</label>
+                    <input class="r-name" type="text" value="Burger Black Angus"/>
+                    <input class="r-desc" type="text" value="Cheddar maturat, sos casei"/>
+                    <input class="r-price" type="number" value="58"/>
+                  </div>
+                  <div>
+                    <label>Fel 3</label>
+                    <input class="r-name" type="text" value="Cheesecake cu fructe de pădure"/>
+                    <input class="r-desc" type="text" value="Cremă fină, blat biscuiți"/>
+                    <input class="r-price" type="number" value="29"/>
+                  </div>
+                </div>
+                <div class="grid two">
+                  <div>
+                    <label>Adresă</label>
+                    <input id="r-addr" type="text" value="Str. Gustului 12, Brașov"/>
+                  </div>
+                  <div>
+                    <label>Program</label>
+                    <input id="r-hours" type="text" value="L–D: 11:00–22:00"/>
+                  </div>
+                </div>
+              </div>
+
+ <!-- Shop content builder -->
+              <div class="grid hidden" data-content="shop">
+                <div class="grid three">
+                  <div>
+                    <label>Produs 1</label>
+                    <input class="s-name" type="text" value="Geacă tech"/>
+                    <input class="s-price" type="number" value="299"/>
+                    <input class="s-img" type="url" value="https://images.unsplash.com/photo-1516826957135-700dedea698c?q=80&w=800&auto=format&fit=crop"/>
+                  </div>
+                  <div>
+                    <label>Produs 2</label>
+                    <input class="s-name" type="text" value="Rucsac urban"/>
+                    <input class="s-price" type="number" value="189"/>
+                    <input class="s-img" type="url" value="https://images.unsplash.com/photo-1504275107627-0c2ba7a43dba?q=80&w=800&auto=format&fit=crop"/>
+                  </div>
+                  <div>
+                    <label>Produs 3</label>
+                    <input class="s-name" type="text" value="Adidași minimal"/>
+                    <input class="s-price" type="number" value="349"/>
+                    <input class="s-img" type="url" value="https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=800&auto=format&fit=crop"/>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Portfolio content builder -->
+              <div class="grid hidden" data-content="portfolio">
+                <div class="grid two">
+                  <div>
+                    <label>Proiect 1</label>
+                    <input class="p-title" type="text" value="Branding Café"/>
+                    <input class="p-img" type="url" value="https://images.unsplash.com/photo-1510337550647-e84f83e341ca?q=80&w=1200&auto=format&fit=crop"/>
+                  </div>
+                  <div>
+                    <label>Proiect 2</label>
+                    <input class="p-title" type="text" value="Landing Fintech"/>
+                    <input class="p-img" type="url" value="https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=1200&auto=format&fit=crop"/>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Services content builder -->
+              <div class="grid hidden" data-content="services">
+                <div class="grid two">
+                  <div>
+                    <label>Serviciu 1</label>
+                    <input class="v-name" type="text" value="Web Design"/>
+                    <textarea class="v-desc">Interfețe rapide, moderne și optimizate.</textarea>
+                  </div>
+                  <div>
+                    <label>Serviciu 2</label>
+                    <input class="v-name" type="text" value="SEO & Audit"/>
+                    <textarea class="v-desc">Creștem vizibilitatea și performanța site-ului.</textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid two" style="margin-top:12px">
+            <button class="btn primary block" id="btnGenerate" aria-disabled="true" disabled>Generează preview</button>
+            <button class="btn block" id="btnSave">Salvează setările</button>
+          </div>
+          <div class="grid two" style="margin-top:8px">
+            <button class="btn small" id="btnLoad">Încarcă setările</button>
+            <span class="muted" style="display:flex;align-items:center"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Preview -->
+      <div class="previewWrap" aria-label="Previzualizare site">
+        <div class="previewToolbar" id="previewToolbar" hidden>
+          <!-- simplificat pentru accesibilitate; fără comenzi de device / share -->
+        </div>
+        <div class="preview" id="preview" aria-busy="true">
+          <div class="bar"><div class="dot"></div><div class="dot"></div><div class="dot"></div><span style="margin-left:8px">Previzualizare</span></div>
+          <div id="emptyState" class="empty">
+            <div>
+              <p style="margin:0 0 8px;font-weight:800">Completează câmpurile obligatorii și apasă „Generează preview”.</p>
+              <p style="margin:0"></p>
+            </div>
+          </div>
+          <iframe id="frame" title="Previzualizare șablon" hidden></iframe>
+          <div class="fade-overlay" id="blurOverlay" hidden>
+      <div class="lock-message">
+        🔒 Îți place direcția? Hai să discutăm o variantă de 
+        <strong>10× mai bună</strong>.
+        <br>
+        <a class="btn small primary" id="contactBtn"
+           href="mailto:contact@example.com?subject=Vreau%20o%20variant%C4%83%20mai%20bun%C4%83">
+           Contact
+        </a>
+      </div>
+    </div>
+      </div>
+    </div>
+  </div>
+
+  </div>
+
+  <script>
+    const $ = (sel, root=document) => root.querySelector(sel);
+    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+    /* --------- i18n (RO/EN) --------- */
+    const i18n = {
+      ro:{
+        setup:"Setări & conținut", content:"Conținut specific template", brand:"Nume brand (obligatoriu)", tag:"Slogan / scurtă descriere (obligatoriu)",
+        colors:"Paletă de culori", custom:"Culoare personalizată", secondary:"Culoare secundară", font:"Font",
+        logo:"Logo (png/svg – opțional)", hero:"Imagine erou (URL)",
+        gen:"Generează preview", save:"Salvează setările", load:"Încarcă setările"
+      },
+      en:{
+        setup:"Setup & Content", content:"Template-specific content", brand:"Brand name (required)", tag:"Tagline / short description (required)",
+        colors:"Color palette", custom:"Custom color", secondary:"Secondary color", font:"Font",
+        logo:"Logo (png/svg – optional)", hero:"Hero image (URL)",
+        gen:"Generate preview", save:"Save settings", load:"Load settings"
+      }
+    }
+
+    const langTabs = $$('#i18nTabs .tab');
+    let LANG = 'ro';
+    langTabs.forEach(t=>t.addEventListener('click',()=>{
+      langTabs.forEach(x=>x.classList.remove('active')); t.classList.add('active'); LANG=t.dataset.lang; applyI18n();
+    }))
+    function tx(key){return i18n[LANG][key]||key}
+    function applyI18n(){
+      $('#ui_setup').textContent=tx('setup');
+      $('#ui_content').textContent=tx('content');
+      $('#lbl_brand').textContent=tx('brand');
+      $('#lbl_tag').textContent=tx('tag');
+      $('#lbl_colors').textContent=tx('colors');
+      $('#lbl_custom').textContent=tx('custom');
+      $('#lbl_secondary').textContent=tx('secondary');
+      $('#lbl_font').textContent=tx('font');
+      $('#lbl_logo').textContent=tx('logo');
+      $('#lbl_hero').textContent=tx('hero');
+      $('#btnGenerate').textContent=tx('gen');
+      $('#btnSave').textContent=tx('save');
+      $('#btnLoad').textContent=tx('load');
+      render();
+    }
+
+    /* --------- palette presets --------- */
+    const palettes = [
+      ['#4f46e5','#0ea5e9'], // indigo / sky
+      ['#22c55e','#06b6d4'], // green / cyan
+      ['#f59e0b','#ef4444'], // amber / red
+      ['#a855f7','#ec4899'], // purple / pink
+      ['#111827','#2563eb'], // slate / blue
+      ['#0ea5e9','#14b8a6'], // sky / teal
+    ];
+    const paletteWrap = $('#palette');
+    palettes.forEach((p,i)=>{
+      const sw=document.createElement('div'); sw.className='swatch'; sw.style.background=`linear-gradient(145deg, ${p[0]}, ${p[1]})`; sw.title=p.join(' + ');
+      if(i===0) sw.classList.add('active');
+      sw.addEventListener('click',()=>{
+        $$('.swatch').forEach(x=>x.classList.remove('active')); sw.classList.add('active');
+        $('#colorPrimary').value=p[0]; $('#colorSecondary').value=p[1]; render();
+      });
+      paletteWrap.appendChild(sw);
+    });
+
+    /* --------- template tab switching --------- */
+    const tplTabs = $$('#templateTabs .tab');
+    let TEMPLATE = 'restaurant';
+    tplTabs.forEach(t=>t.addEventListener('click',()=>{
+      tplTabs.forEach(x=>x.classList.remove('active')); t.classList.add('active'); TEMPLATE=t.dataset.tpl; showContentBlock(); render();
+    }));
+    function showContentBlock(){
+      $$('[data-content]').forEach(b=>b.classList.add('hidden'));
+      $(`[data-content="${TEMPLATE}"]`)?.classList.remove('hidden');
+    }
+
+    /* --------- logo upload --------- */
+    let logoDataURL='';
+    $('#logoInput').addEventListener('change', async (e)=>{
+      const file = e.target.files?.[0]; if(!file) return;
+      const reader = new FileReader(); reader.onload = ()=>{logoDataURL = reader.result; render();}; reader.readAsDataURL(file);
+    });
+
+    /* --------- state handling --------- */
+    function getState(){
+      return {
+        lang: LANG,
+        tpl: TEMPLATE,
+        brand: $('#brandName').value.trim()||'Brand',
+        tag: $('#tagline').value.trim()||'',
+        primary: $('#colorPrimary').value,
+        secondary: $('#colorSecondary').value,
+        font: $('#fontSelect').value,
+        logo: logoDataURL, hero: $('#heroUrl').value,
+        content: collectContent()
+      }
+    }
+    function setState(s){
+      if(!s) return;
+      LANG=s.lang||'ro'; TEMPLATE=s.tpl||'restaurant';
+      $('#brandName').value=s.brand||''; $('#tagline').value=s.tag||'';
+      $('#colorPrimary').value=s.primary||'#4f46e5'; $('#colorSecondary').value=s.secondary||'#0ea5e9';
+      $('#fontSelect').value=s.font||'Inter'; logoDataURL=s.logo||''; $('#heroUrl').value=s.hero||'';
+      // tabs visual
+      langTabs.forEach(x=>x.classList.toggle('active', x.dataset.lang===LANG)); applyI18n();
+      tplTabs.forEach(x=>x.classList.toggle('active', x.dataset.tpl===TEMPLATE)); showContentBlock();
+      // content
+      injectContent(s.content||{});
+      render();
+    }
+
+    function collectContent(){
+      if(TEMPLATE==='restaurant'){
+        const items = [];
+        const blocks = $$('.grid[data-content="restaurant"] .grid.three > div');
+        blocks.forEach(b=>{
+          items.push({name:$('.r-name',b).value, desc:$('.r-desc',b).value, price:$('.r-price',b).value});
+        });
+        return {items, addr: $('#r-addr').value, hours: $('#r-hours').value};
+      }
+      if(TEMPLATE==='shop'){
+        const prods=[]; const blocks = $$('.grid[data-content="shop"] .grid.three > div');
+        blocks.forEach(b=> prods.push({name:$('.s-name',b).value, price:$('.s-price',b).value, img:$('.s-img',b).value}));
+        return {products:prods};
+      }
+      if(TEMPLATE==='portfolio'){
+        const projs=[]; const blocks = $$('.grid[data-content="portfolio"] .grid.two > div');
+        blocks.forEach(b=> projs.push({title:$('.p-title',b).value, img:$('.p-img',b).value}));
+        return {projects:projs};
+      }
+      if(TEMPLATE==='services'){
+        const serv=[]; const blocks = $$('.grid[data-content="services"] .grid.two > div');
+        blocks.forEach(b=> serv.push({name:$('.v-name',b).value, desc:$('.v-desc',b).value}));
+        return {services:serv};
+      }
+      return {};
+    }
+    function injectContent(data){
+      if(TEMPLATE==='restaurant' && data.items){
+        const blocks = $$('.grid[data-content="restaurant"] .grid.three > div');
+        blocks.forEach((b,i)=>{ if(data.items[i]){ $('.r-name',b).value=data.items[i].name||''; $('.r-desc',b).value=data.items[i].desc||''; $('.r-price',b).value=data.items[i].price||''; } });
+        $('#r-addr').value = data.addr||''; $('#r-hours').value=data.hours||'';
+      }
+      if(TEMPLATE==='shop' && data.products){
+        const blocks = $$('.grid[data-content="shop"] .grid.three > div');
+        blocks.forEach((b,i)=>{ if(data.products[i]){ $('.s-name',b).value=data.products[i].name||''; $('.s-price',b).value=data.products[i].price||''; $('.s-img',b).value=data.products[i].img||''; } });
+      }
+      if(TEMPLATE==='portfolio' && data.projects){
+        const blocks = $$('.grid[data-content="portfolio"] .grid.two > div');
+        blocks.forEach((b,i)=>{ if(data.projects[i]){ $('.p-title',b).value=data.projects[i].title||''; $('.p-img',b).value=data.projects[i].img||''; } });
+      }
+      if(TEMPLATE==='services' && data.services){
+        const blocks = $$('.grid[data-content="services"] .grid.two > div');
+        blocks.forEach((b,i)=>{ if(data.services[i]){ $('.v-name',b).value=data.services[i].name||''; $('.v-desc',b).value=data.services[i].desc||''; } });
+      }
+    }
+
+    /* --------- render → iframe --------- */
+    function render(){
+      validateForm();
+      const s = getState();
+      const doc = `<!DOCTYPE html><html lang="${s.lang}"><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>
+        <link href='https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&family=Playfair+Display:wght@600;700&family=Figtree:wght@400;700;900&display=swap' rel='stylesheet'>
+        <style>${inlineTemplateCSS()}</style>
+        <title>${escapeHtml(s.brand)}</title></head><body class='tpl-root tpl' style='--tpl-primary:${s.primary};--tpl-secondary:${s.secondary};--tpl-font:${cssFont(s.font)}'>
+          ${templateHTML(s)}
+        </body></html>`;
+      const blob = new Blob([doc], {type:'text/html'});
+      const url = URL.createObjectURL(blob); $('#frame').src = url;
+    }
+
+    function inlineTemplateCSS(){
+      return `
+      .tpl-root{--tpl-primary:#4f46e5;--tpl-secondary:#0ea5e9;--tpl-font:Inter}
+      .tpl{font-family:var(--tpl-font, Inter), system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;color:#0f172a}
+      .tpl a{text-decoration:none;color:inherit}
+      .tpl .hero{position:relative;padding:90px 28px;background:linear-gradient(135deg, var(--tpl-primary) 0%, var(--tpl-secondary) 100%);color:white}
+      .tpl .hero .inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.1fr 1fr;gap:30px;align-items:center}
+      .tpl .hero h1{font-size:42px;line-height:1.05;margin:0;font-family:var(--tpl-font)}
+      .tpl .hero p{opacity:.9;margin:10px 0 18px}
+      .tpl .hero .cta{display:flex;gap:10px;flex-wrap:wrap}
+      .tpl .btn{background:#fff;color:#111827;padding:12px 16px;border-radius:12px;font-weight:800;border:2px solid rgba(0,0,0,.08)}
+      .tpl .btn.sec{background:transparent;color:#fff;border-color:rgba(255,255,255,.6)}
+      .tpl nav{backdrop-filter:saturate(180%) blur(8px);position:sticky;top:0;background:rgba(255,255,255,.7);border-bottom:1px solid rgba(0,0,0,.08)}
+      .tpl nav .inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:12px 20px}
+      .tpl nav .logo{display:flex;align-items:center;gap:10px;font-weight:900}
+      .tpl section{padding:56px 20px}
+      .tpl .container{max-width:1100px;margin:0 auto}
+      .tpl .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
+      .tpl .card{border:1px solid #e5e7eb;border-radius:14px;padding:18px;background:#fff}
+      .tpl .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+      .tpl footer{padding:34px 20px;background:#0b1227;color:#cbd5e1}
+      .tpl .menu-item,.tpl .product,.tpl .project,.tpl .service{border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fff;display:flex;gap:14px;align-items:center}
+      .tpl .price{color:var(--tpl-secondary);font-weight:900}
+      .tpl .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+      .tpl .gallery img{width:100%;height:120px;object-fit:cover;border-radius:12px}
+      .tpl .badge{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.5);font-weight:800}
+      @media (max-width:900px){.tpl .hero .inner{grid-template-columns:1fr}}`
+    }
+
+    function cssFont(f){ return /\s/.test(f)? `'${f}'` : f }
+    function escapeHtml(str){ return String(str).replace(/[&<>"]?/g, s=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[s]||s)) }
+
+    function logoTag(s){ return s.logo? `<img src='${s.logo}' alt='' style='width:28px;height:28px;border-radius:8px;object-fit:cover'>` : `<span class='badge'>${s.brand.slice(0,2).toUpperCase()}</span>` }
+
+    function templateHTML(s){
+      const heroImg = s.hero? `<img src='${s.hero}' alt='' style='width:100%;border-radius:16px;box-shadow:0 12px 24px rgba(0,0,0,.25)'>` : '';
+      const CTA = LANG==='ro'? ['Contactează-ne','Vezi mai mult'] : ['Contact us','Learn more'];
+
+      if(s.tpl==='restaurant'){
+        const items = (s.content.items||[]).map(it=>`<div class='menu-item'><div style='flex:1'><div style='font-weight:900'>${escapeHtml(it.name)}</div><div style='opacity:.7'>${escapeHtml(it.desc||'')}</div></div><div class='price'>${Number(it.price)||''} LEI</div></div>`).join('');
+        return `
+          <nav><div class='inner'><div class='logo'>${logoTag(s)} ${escapeHtml(s.brand)}</div><div style='display:flex;gap:14px'><a href='#m'>Meniu</a><a href='#g'>Galerie</a><a href='#c'>Contact</a></div></div></nav>
+          <header class='hero'><div class='inner'><div><h1>${escapeHtml(s.brand)}</h1><p>${escapeHtml(s.tag)}</p>
+          <div class='cta'><a class='btn' href='#m'>${CTA[1]}</a><a class='btn sec' href='#c'>${CTA[0]}</a></div></div>${heroImg}</div></header>
+          <section id='m'><div class='container'>
+            <h2 style='margin:0 0 14px'>${LANG==='ro'?'Meniu select':'Selected menu'}</h2>
+            <div class='grid-2'>
+              <div class='cards'>${items}</div>
+              <div class='card'><h3 style='margin:0 0 10px'>${LANG==='ro'?'Detalii':'Details'}</h3>
+                <div>${LANG==='ro'?'Adresă:':'Address:'} <strong>${escapeHtml(s.content.addr||'')}</strong></div>
+                <div>${LANG==='ro'?'Program:':'Hours:'} <strong>${escapeHtml(s.content.hours||'')}</strong></div>
+                <div style='margin-top:10px'><a class='btn' href='#c'>${CTA[0]}</a></div>
+              </div>
+            </div>
+          </div></section>
+          <section id='g' style='background:#f8fafc'>
+            <div class='container'>
+              <h2 style='margin:0 0 14px'>${LANG==='ro'?'Galerie':'Gallery'}</h2>
+              <div class='gallery'>
+                <img src='https://images.unsplash.com/photo-1541542684-4a66f7c2d782?q=80&w=800&auto=format&fit=crop'>
+                <img src='https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=800&auto=format&fit=crop'>
+                <img src='https://images.unsplash.com/photo-1528697203043-733bfdca2f98?q=80&w=800&auto=format&fit=crop'>
+                <img src='https://images.unsplash.com/photo-1481833761820-0509d3217039?q=80&w=800&auto=format&fit=crop'>
+              </div>
+            </div>
+          </section>
+          <footer id='c'><div class='container'>
+            <div style='display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap'>
+              <div style='display:flex;align-items:center;gap:10px'><div class='logo'>${logoTag(s)} ${escapeHtml(s.brand)}</div></div>
+              <div>${LANG==='ro'?'Rezervări:':'Bookings:'} <strong>+40 712 345 678</strong> · <a href='mailto:contact@example.com'>contact@example.com</a></div>
+            </div>
+          </div></footer>`;
+      }
+
+      if(s.tpl==='shop'){
+        const prods = (s.content.products||[]).map(p=>`<div class='product'><img src='${p.img}' alt='' style='width:80px;height:80px;object-fit:cover;border-radius:10px'><div style='flex:1'><div style='font-weight:900'>${escapeHtml(p.name)}</div></div><div class='price'>${Number(p.price)||''} RON</div></div>`).join('');
+        return `
+          <nav><div class='inner'><div class='logo'>${logoTag(s)} ${escapeHtml(s.brand)}</div><div style='display:flex;gap:14px'><a href='#p'>Produse</a><a href='#c'>Contact</a></div></div></nav>
+          <header class='hero'><div class='inner'><div><h1>${escapeHtml(s.brand)}</h1><p>${escapeHtml(s.tag)}</p><div class='cta'><a class='btn' href='#p'>${LANG==='ro'?'Cumpără acum':'Shop now'}</a></div></div>${heroImg}</div></header>
+          <section id='p'><div class='container'><h2>Best sellers</h2><div class='cards'>${prods}</div></div></section>
+          <footer id='c'><div class='container'><div style='display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap'><div class='logo'>${logoTag(s)} ${escapeHtml(s.brand)}</div><div>© ${new Date().getFullYear()} · ${LANG==='ro'?'Toate drepturile rezervate':'All rights reserved'}</div></div></div></footer>`
+      }
+
+      if(s.tpl==='portfolio'){
+        const projs = (s.content.projects||[]).map(p=>`<div class='project'><img src='${p.img}' alt='' style='width:80px;height:80px;object-fit:cover;border-radius:10px'><div style='flex:1'><div style='font-weight:900'>${escapeHtml(p.title)}</div><div class='muted'>UI/UX, Web</div></div><a class='btn' href='#'>Case</a></div>`).join('');
+        return `
+          <nav><div class='inner'><div class='logo'>${logoTag(s)} ${escapeHtml(s.brand)}</div><div style='display:flex;gap:14px'><a href='#w'>Work</a><a href='#c'>Contact</a></div></div></nav>
+          <header class='hero'><div class='inner'><div><h1>${escapeHtml(s.brand)}</h1><p>${escapeHtml(s.tag)}</p><div class='cta'><a class='btn' href='#w'>Work</a><a class='btn sec' href='#c'>${LANG==='ro'?'Contact':'Contact'}</a></div></div>${heroImg}</div></header>
+          <section id='w'><div class='container'><h2>Projects</h2><div class='cards'>${projs}</div></div></section>
+          <footer id='c'><div class='container'><div style='display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap'><div class='logo'>${logoTag(s)} ${escapeHtml(s.brand)}</div><div>Behance · Dribbble · LinkedIn</div></div></div></footer>`
+      }
+
+      if(s.tpl==='services'){
+        const serv = (s.content.services||[]).map(v=>`<div class='service'><div style='flex:1'><div style='font-weight:900'>${escapeHtml(v.name)}</div><div class='muted'>${escapeHtml(v.desc||'')}</div></div><a class='btn' href='#c'>${LANG==='ro'?'Detalii':'Details'}</a></div>`).join('');
+        return `
+          <nav><div class='inner'><div class='logo'>${logoTag(s)} ${escapeHtml(s.brand)}</div><div style='display:flex;gap:14px'><a href='#s'>Servicii</a><a href='#c'>Contact</a></div></div></nav>
+          <header class='hero'><div class='inner'><div><h1>${escapeHtml(s.brand)}</h1><p>${escapeHtml(s.tag)}</p><div class='cta'><a class='btn' href='#s'>${LANG==='ro'?'Vezi servicii':'See services'}</a></div></div>${heroImg}</div></header>
+          <section id='s'><div class='container'><h2>${LANG==='ro'?'Ce oferim':'What we offer'}</h2><div class='cards'>${serv}</div></div></section>
+          <footer id='c'><div class='container'><div style='display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap'><div class='logo'>${logoTag(s)} ${escapeHtml(s.brand)}</div><div>contact@example.com</div></div></div></footer>`
+      }
+      return '';
+    }
+
+    /* --------- actions --------- */
+    function validateForm(){
+      const ok = $('#brandName').value.trim().length>1 && $('#tagline').value.trim().length>1;
+      $('#btnGenerate').disabled = !ok;
+      $('#btnGenerate').setAttribute('aria-disabled', String(!ok));
+      return ok;
+    }
+
+    // Generate preview only after required data exists
+    $('#btnGenerate').addEventListener('click', ()=>{
+      if(!validateForm()) { toast(LANG==='ro'? 'Completează câmpurile obligatorii.' : 'Please fill required fields.'); return; }
+      render();
+      // show iframe + paywall
+      $('#emptyState').hidden = true;
+      $('#frame').hidden = false;
+      $('#blurOverlay').hidden = false;
+      $('#preview').setAttribute('aria-busy','false');
+      $('#previewToolbar').hidden = false;
+      toast(LANG==='ro'? 'Previzualizare generată (75%).' : 'Preview generated (75%).');
+    });
+
+    $('#btnSave').addEventListener('click',()=>{ localStorage.setItem('sitecraft-demo', JSON.stringify(getState())); toast(LANG==='ro'? 'Setările au fost salvate.' : 'Settings saved.'); });
+    $('#btnLoad').addEventListener('click',()=>{ const s = JSON.parse(localStorage.getItem('sitecraft-demo')||'null'); s? setState(s): toast(LANG==='ro'? 'Nu există setări salvate.' : 'No saved settings.'); });
+
+    function slug(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')||'sitecraft'}
+
+    function toast(msg){
+      const t=document.createElement('div'); t.textContent=msg; t.style.cssText='position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(20,25,45,.96);color:#fff;padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);z-index:99;max-width:90vw;';
+      document.body.appendChild(t); setTimeout(()=>t.remove(), 1800);
+    }
+
+    // auto-load from hash if present (kept, dar fără share public și fără export)
+    window.addEventListener('load',()=>{
+      try{
+        if(location.hash.length>1){
+          const json = decodeURIComponent(atob(location.hash.slice(1)));
+          const s = JSON.parse(json); setState(s); return;
+        }
+      }catch(e){/* ignore */}
+      // nu generăm preview până nu sunt completate câmpurile necesare
+      validateForm();
+    })
+  </script>
+</body>
+</html>
