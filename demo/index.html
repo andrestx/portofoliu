@@ -297,6 +297,194 @@
 </head>
 
 <body>
+
+
+
+
+
+
+
+
+
+<!-- ✅ SIMULATOR NOTICE (versiune negru + #ff6c6c / #ff9c6c) -->
+<div id="sim-notice"
+     class="sim-overlay"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="sim-title"
+     aria-describedby="sim-desc"
+     data-back-url="https://www.andreist.great-site.net"
+     data-email="andreistanescux@gmail.com">
+  <div class="sim-card" role="document">
+    <div class="sim-badge">Simulator</div>
+    <h2 id="sim-title" class="sim-title">Acesta este un simulator cu proprietăți limitate</h2>
+    <p id="sim-desc" class="sim-text">
+      Pentru cea mai reușită variantă, cel mai indicat este să mă contactezi la
+      <a class="sim-link" id="sim-mail" href="#">andreistanescux@gmail.com</a>.
+    </p>
+
+    <div class="sim-actions">
+      <a id="sim-back" class="sim-btn sim-btn-ghost" href="#" rel="noopener">Înapoi pe site</a>
+      <a id="sim-contact" class="sim-btn sim-btn-outline" href="#" rel="noopener">Contact</a>
+      <button id="sim-continue" class="sim-btn sim-btn-solid" type="button">Continuă</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  :root {
+    --sim-bg-dark: 0 0 0;           /* fundal negru */
+    --sim-fg-light: 240 240 240;
+    --sim-accent: 255 108 108;      /* #ff6c6c */
+    --sim-accent-2: 255 156 108;    /* #ff9c6c */
+  }
+
+  /* Overlay */
+  .sim-overlay {
+    position: fixed; inset: 0;
+    display: grid; place-items: center;
+    background: radial-gradient(1000px 800px at 20% 10%, rgba(var(--sim-accent),0.25), transparent 70%),
+                radial-gradient(900px 700px at 80% 90%, rgba(var(--sim-accent-2),0.2), transparent 70%),
+                rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    z-index: 99999;
+    animation: sim-fade-in 280ms ease-out both;
+  }
+
+  /* Card */
+  .sim-card {
+    width: min(720px, 92vw);
+    border-radius: 20px;
+    padding: 28px;
+    color: rgb(var(--sim-fg-light));
+    background:
+      linear-gradient(180deg, rgba(20,20,20,0.9), rgba(0,0,0,0.92)) padding-box,
+      linear-gradient(135deg, rgba(var(--sim-accent),0.4), rgba(var(--sim-accent-2),0.4)) border-box;
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 14px 32px rgba(0,0,0,0.65);
+    animation: sim-pop 360ms cubic-bezier(.2,.9,.2,1) both;
+  }
+
+  .sim-badge {
+    display: inline-block;
+    font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+    color: #fff;
+    background: linear-gradient(90deg, #ff6c6c, #ff9c6c);
+    padding: 6px 12px; border-radius: 999px;
+    box-shadow: 0 6px 16px rgba(255,108,108,0.4);
+  }
+
+  .sim-title {
+    margin: 14px 0 8px;
+    font-size: clamp(22px, 3.4vw, 30px);
+    font-weight: 800;
+    background: linear-gradient(90deg, #ff6c6c, #ff9c6c);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+
+  .sim-text {
+    margin: 0 0 18px;
+    font-size: clamp(14px, 2vw, 16px);
+    color: #d1d5db;
+  }
+
+  .sim-link {
+    color: #ff9c6c;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .sim-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.2fr;
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  .sim-btn {
+    -webkit-tap-highlight-color: transparent;
+    appearance: none;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 12px; padding: 12px 16px;
+    font-weight: 700;
+    border: 1px solid transparent;
+    cursor: pointer; text-decoration: none;
+    transition: all .18s ease;
+  }
+
+  .sim-btn-ghost {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.15);
+    color: #f1f1f1;
+  }
+  .sim-btn-ghost:hover { background: rgba(255,255,255,0.16); }
+
+  .sim-btn-outline {
+    background: transparent;
+    border: 1px solid #ff9c6c;
+    color: #ff9c6c;
+  }
+  .sim-btn-outline:hover {
+    background: rgba(255,156,108,0.15);
+  }
+
+  .sim-btn-solid {
+    color: white;
+    background: linear-gradient(90deg, #ff6c6c, #ff9c6c);
+    border: none;
+    box-shadow: 0 8px 20px rgba(255,108,108,0.35);
+  }
+  .sim-btn-solid:hover { box-shadow: 0 10px 24px rgba(255,156,108,0.45); }
+
+  @keyframes sim-fade-in { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes sim-pop {
+    0% { opacity: 0; transform: translateY(14px) scale(0.96) }
+    100% { opacity: 1; transform: translateY(0) scale(1) }
+  }
+
+  @media (max-width: 520px) {
+    .sim-actions { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  (function () {
+    const overlay = document.getElementById('sim-notice');
+    if (!overlay) return;
+
+    const email = overlay.dataset.email;
+    const backUrl = overlay.dataset.backUrl;
+
+    const mailLink = document.getElementById('sim-mail');
+    const backBtn = document.getElementById('sim-back');
+    const contactBtn = document.getElementById('sim-contact');
+    const continueBtn = document.getElementById('sim-continue');
+
+    const mailto = `mailto:${email}?subject=${encodeURIComponent('Cerere versiune completă')}`;
+    mailLink.textContent = email;
+    mailLink.href = mailto;
+    backBtn.href = backUrl;
+    contactBtn.href = mailto;
+
+    continueBtn.addEventListener('click', () => overlay.remove());
+    overlay.addEventListener('keydown', e => { if (e.key === 'Escape') overlay.remove(); });
+    setTimeout(() => continueBtn.focus({ preventScroll: true }), 0);
+  })();
+</script>
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
   
    <nav>
     <a href="#" class="logo-container">
